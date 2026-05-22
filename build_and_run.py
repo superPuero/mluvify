@@ -4,7 +4,7 @@ import sys
 
 FRONTEND_DIR = "mluvify_fe"  
 BACKEND_DIR = "mluvify_be"
-BACKEND_SERVER_FILE = "app/main.py"  
+BACKEND_SERVER_FILE = "app/main.py"
 
 BACKEND_SERVER_FILE_FULL = os.path.join(BACKEND_DIR, BACKEND_SERVER_FILE)
 
@@ -36,6 +36,7 @@ def build_frontend():
             text=True
         )                
         print("Frontend build complete!\n")
+        
     except subprocess.CalledProcessError as e:
         print("Frontend build failed, see the error above")
         sys.exit(1)

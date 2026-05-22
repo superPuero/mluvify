@@ -27,5 +27,4 @@ class AudioFileValidator:
         
         return file
 
-
 AudioFile = Annotated[UploadFile, Depends(AudioFileValidator({"mp3", "webm", "m4a", "ogg"}))]
