@@ -2,7 +2,7 @@ import subprocess
 import os
 import sys
 
-FRONTEND_DIR = "mluvify_fe"  
+FRONTEND_DIR = "mluvify_fe"
 BACKEND_DIR = "mluvify_be"
 BACKEND_SERVER_FILE = "app/main.py"
 
@@ -16,18 +16,18 @@ if os.name == "nt":
 else:               
     VENV_PYTHON = os.path.join(VENV_DIR, "bin", "python")
 
-def build_frontend():
+def build_frontend() -> None:
     print("Building svelte frontend...")
-    
+
     npm_cmd = "npm.cmd" if os.name == "nt" else "npm"
     
     try:
-        result = subprocess.run(
-            [npm_cmd, "install"],
-            cwd=FRONTEND_DIR,
-            check=True,
-            text=True
-        )   
+        # result = subprocess.run(
+        #     [npm_cmd, "install"],
+        #     cwd=FRONTEND_DIR,
+        #     check=True,
+        #     text=True
+        # )   
         
         result = subprocess.run(
             [npm_cmd, "run", "build"],
@@ -44,13 +44,19 @@ def build_frontend():
         print("Could not find npm, make sure Node.js is installed")
         sys.exit(1)
 
-def start_server():
-    print(f"Starting FastAPI server using venv: {VENV_PYTHON}")
-    
+
+def sync_environment() -> None:
     if not os.path.exists(VENV_PYTHON):
         print(f"\nError: Could not find virtual environment Python at {VENV_PYTHON}")
         print(f"Please navigate to {BACKEND_DIR} and run: python -m venv .venv")
         sys.exit(1)
+    
+    subprocess.run([VENV_PYTHON, "-m", "pip", "install", "uv"])
+    subprocess.run(["uv", "sync"])
+
+
+def start_server() -> None:
+    print(f"Starting FastAPI server using venv: {VENV_PYTHON}")
 
     try:
         subprocess.run([
@@ -68,10 +74,11 @@ def start_server():
         print(f"Failed to start server: {e}")
         sys.exit(1)
 
-if __name__ == "__main__":
+
+def runner() -> None:
     if not os.path.exists(FRONTEND_DIR):
         print(f"Error: Frontend directory '{FRONTEND_DIR}' not found")
-        sys.exit(1)        
+        sys.exit(1)
         
     if not os.path.exists(BACKEND_DIR):
         print(f"Error: Backend directory '{BACKEND_DIR}' not found")
@@ -82,4 +89,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     build_frontend()
+    sync_environment()
     start_server()
+
+
+if __name__ == "__main__":
+    runner()
