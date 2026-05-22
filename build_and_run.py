@@ -8,13 +8,12 @@ BACKEND_SERVER_FILE = "app/main.py"
 
 BACKEND_SERVER_FILE_FULL = os.path.join(BACKEND_DIR, BACKEND_SERVER_FILE)
 
-# 1. Define the path to the virtual environment
-VENV_DIR = os.path.join(BACKEND_DIR, ".venv")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+VENV_DIR = os.path.join(BASE_DIR, BACKEND_DIR, ".venv")
 
-# 2. Get the correct Python executable path depending on the OS
-if os.name == "nt":  # Windows
+if os.name == "nt":
     VENV_PYTHON = os.path.join(VENV_DIR, "Scripts", "python.exe")
-else:                # Mac/Linux
+else:               
     VENV_PYTHON = os.path.join(VENV_DIR, "bin", "python")
 
 def build_frontend():
@@ -23,6 +22,13 @@ def build_frontend():
     npm_cmd = "npm.cmd" if os.name == "nt" else "npm"
     
     try:
+        result = subprocess.run(
+            [npm_cmd, "install"],
+            cwd=FRONTEND_DIR,
+            check=True,
+            text=True
+        )   
+        
         result = subprocess.run(
             [npm_cmd, "run", "build"],
             cwd=FRONTEND_DIR,
@@ -40,7 +46,6 @@ def build_frontend():
 def start_server():
     print(f"Starting FastAPI server using venv: {VENV_PYTHON}")
     
-    # Ensure the virtual environment actually exists before trying to use it
     if not os.path.exists(VENV_PYTHON):
         print(f"\nError: Could not find virtual environment Python at {VENV_PYTHON}")
         print(f"Please navigate to {BACKEND_DIR} and run: python -m venv .venv")
