@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.utils.deps import AudioFile
 
 from app.core.ollama import OllamaDep
+from app.core.whisper import whisper_model
 
 router = APIRouter(
     prefix="/analyze",
@@ -11,7 +12,7 @@ router = APIRouter(
 
 @router.get("/semantic")
 async def analyze_semantic(ollama: OllamaDep, file: AudioFile):
-    return {"test": "test"}
+    pass
 
 
 @router.get("/rithoric", deprecated=True)
