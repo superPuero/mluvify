@@ -22,19 +22,19 @@ def build_frontend() -> None:
     npm_cmd = "npm.cmd" if os.name == "nt" else "npm"
     
     try:
-        # result = subprocess.run(
-        #     [npm_cmd, "install"],
-        #     cwd=FRONTEND_DIR,
-        #     check=True,
-        #     text=True
-        # )   
+        result = subprocess.run(
+            [npm_cmd, "install"],
+            cwd=FRONTEND_DIR,
+            check=True,
+            text=True
+        )
         
         result = subprocess.run(
             [npm_cmd, "run", "build"],
             cwd=FRONTEND_DIR,
             check=True,
             text=True
-        )                
+        )
         print("Frontend build complete!\n")
         
     except subprocess.CalledProcessError as e:
@@ -51,8 +51,11 @@ def sync_environment() -> None:
         print(f"Please navigate to {BACKEND_DIR} and run: python -m venv .venv")
         sys.exit(1)
     
+    print("Ensuring pip is installed and up to date")
+    subprocess.run([VENV_PYTHON, "-m", "ensurepip", "--upgrade"], check=True)
+
     subprocess.run([VENV_PYTHON, "-m", "pip", "install", "uv"], check=True)
-    subprocess.run([VENV_PYTHON, "-m", "uv", "sync"], cwd=os.path.join(BASE_DIR, BACKEND_DIR), check=True)
+    subprocess.run([VENV_PYTHON, "-m", "uv", "sync", "--inexact"], cwd=os.path.join(BASE_DIR, BACKEND_DIR), check=True)
 
 def start_server() -> None:
     print(f"Starting FastAPI server using venv: {VENV_PYTHON}")
