@@ -1,13 +1,28 @@
 import uvicorn
+from typing import AsyncGenerator
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers.analyze import router as analyze_router
 from pathlib import Path
+
+from app.routers.analyze import router as analyze_router
+from app.core.ollama import ollama_service
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    await ollama_service.startup()
+
+    yield
+
+    await ollama_service.shutdown()
+
 
 app = FastAPI(
     title="Mluvify",
-    docs_url="/",
+    docs_url="/docs",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -25,6 +40,7 @@ FRONTEND_BUILD_DIR = ROOT_DIR / "mluvify_fe" / "build"
 
 app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR), html=True), name="frontend")
 app.include_router(analyze_router)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
