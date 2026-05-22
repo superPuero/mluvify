@@ -2,13 +2,15 @@ from typing import Annotated
 from ollama import AsyncClient
 from fastapi import HTTPException, Depends
 
+from app.core.settings import settings
+
 
 class OllamaServiceManager:
     def __init__(self) -> None:
         self._client: AsyncClient | None = None
     
     async def startup(self) -> None:
-        self._client = AsyncClient(host="http://localhost:11434")
+        self._client = AsyncClient(host=settings.ollama.host)
     
     async def shutdown(self) -> None:
         self._client = None

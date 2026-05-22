@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
 from app.routers.analyze import router as analyze_router
+from app.core.settings import settings
 from app.core.ollama import ollama_service
 
 
@@ -20,7 +21,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="Mluvify",
+    title=settings.app.name,
     docs_url="/docs",
     lifespan=lifespan,
 )
