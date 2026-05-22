@@ -51,9 +51,8 @@ def sync_environment() -> None:
         print(f"Please navigate to {BACKEND_DIR} and run: python -m venv .venv")
         sys.exit(1)
     
-    subprocess.run([VENV_PYTHON, "-m", "pip", "install", "uv"])
-    subprocess.run(["uv", "sync"])
-
+    subprocess.run([VENV_PYTHON, "-m", "pip", "install", "uv"], check=True)
+    subprocess.run([VENV_PYTHON, "-m", "uv", "sync"], cwd=os.path.join(BASE_DIR, BACKEND_DIR), check=True)
 
 def start_server() -> None:
     print(f"Starting FastAPI server using venv: {VENV_PYTHON}")
