@@ -47,8 +47,14 @@ def start_server():
         sys.exit(1)
 
     try:
-        # 3. Use the VENV_PYTHON instead of sys.executable
-        subprocess.run([VENV_PYTHON, BACKEND_SERVER_FILE_FULL])
+        subprocess.run([
+            VENV_PYTHON, 
+            "-m", 
+            "uvicorn", 
+            "app.main:app", 
+            "--host", "127.0.0.1", 
+            "--port", "8000"
+        ], cwd=BACKEND_DIR)
         
     except KeyboardInterrupt:
         print("\nServer stopped.")

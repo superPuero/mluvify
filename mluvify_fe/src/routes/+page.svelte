@@ -34,9 +34,15 @@
 
 <style>
   /* Global-ish reset for this container */
+    :global(body) {
+        margin: 0;
+        padding: 0;
+        background-color: #000000; 
+    }
+
   .app-container {
     min-height: 100vh;
-    background-color: #0a0a0a;
+    background-color: #000000;
     color: #e5e5e5;
     font-family: system-ui, -apple-system, sans-serif;
     padding: 2rem;

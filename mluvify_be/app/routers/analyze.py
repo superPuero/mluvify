@@ -1,7 +1,5 @@
 from fastapi import APIRouter
-
 from app.utils.deps import AudioFile
-
 
 router = APIRouter(
     prefix="/analyze",
