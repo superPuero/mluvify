@@ -19,7 +19,7 @@ def build_frontend():
             cwd=FRONTEND_DIR,
             check=True,
             text=True
-        )
+        )                
         print("Frontend build complete")
     except subprocess.CalledProcessError as e:
         print("Frontend build failed, see the error above")
