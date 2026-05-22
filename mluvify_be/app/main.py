@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from app.routers.analyze import router as analyze_router
+
 
 app = FastAPI(
     title="Mluvify",
@@ -7,6 +9,4 @@ app = FastAPI(
 )
 
 
-@app.get("/hello")
-async def hello():
-    return {"hello": "world"}
+app.include_router(analyze_router)
