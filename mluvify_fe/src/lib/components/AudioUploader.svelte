@@ -15,7 +15,7 @@
 
     try {
       // Changed to use a variable for cleaner URL management in real apps
-      await fetch('http://localhost:8000/analyze', { method: 'POST', body: formData });
+      await fetch('http://localhost:8000/semantic', { method: 'POST', body: formData });
     } catch (error) {
       console.error("Upload failed:", error);
     } finally {

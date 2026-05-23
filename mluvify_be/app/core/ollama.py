@@ -4,7 +4,6 @@ from fastapi import HTTPException, Depends
 
 from app.core.settings import settings
 
-
 class OllamaServiceManager:
     def __init__(self) -> None:
         self._client: AsyncClient | None = None

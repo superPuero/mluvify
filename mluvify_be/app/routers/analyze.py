@@ -9,9 +9,8 @@ router = APIRouter(
     tags=["Analyze"],
 )
 
-
 @router.get("/semantic")
-async def analyze_semantic(ollama: OllamaDep, file: AudioFile):
+async def analyze_semantic(ollama: OllamaDep, file: AudioFile):            
     pass
 
 
