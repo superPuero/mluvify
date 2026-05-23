@@ -15,9 +15,16 @@ class OllamaSettings(BaseModel):
     host: str
 
 
+class WhisperSettings(BaseModel):
+    model_size: str
+    device: str
+    compute_type: str
+
+
 class Settings(BaseSettings):
     app: AppSettings
     ollama: OllamaSettings
+    whisper: WhisperSettings
 
     model_config = SettingsConfigDict(
         toml_file="config.toml",
