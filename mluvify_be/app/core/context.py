@@ -8,12 +8,17 @@ class MessageEntry(BaseModel):
     text: str
     sentences: list[str]       
     parts_and_lemmas: SpacyPartsAndLemmas  
-                    
+
+class CriteriaContextData(BaseModel):
+    criterias: dict[str, list[float]]
+    all_messages: list[str]
+                                                                                                           
 class CriteriaContext:
     def __init__(self) -> None:
-        self.criterias: dict[str, list[float]] = {}
-        self.all_messages: list[str] = {}      
-              
+       self.criteria_data = CriteriaContextData(
+            criterias={},
+            all_messages=[]
+        )
     def __call__(self):
         return self
                                     

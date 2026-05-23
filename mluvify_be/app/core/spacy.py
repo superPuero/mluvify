@@ -12,9 +12,9 @@ class SpacyModel:
         self.model = spacy.load(model_name)
         
     def into_part_and_lemmas(self, text: str) -> SpacyPartsAndLemmas:
-        doc = self.model(text);
-        lemmas: list[str];
-        parts: list[str];
+        doc = self.model(text)
+        lemmas: list[str] = []
+        parts: list[str] = []
         
         for token in doc:
             if token.is_punct:
