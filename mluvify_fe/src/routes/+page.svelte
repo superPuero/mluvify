@@ -3,9 +3,14 @@
   import AudioUploader from '$lib/components/AudioUploader.svelte';
   import Button from '$lib/components/Button.svelte';
 
+  interface CriteriaContextData {
+    criterias: Record<string, number[]>;
+    all_messages: string[],
+  }
+
   class SessionData {
-    messages = $state([]);
-    criterias = $state({});
+    messages = $state<string[]>([]);
+    criterias = $state<Record<string, number[]>>({});
     
     audio = $state<{ blob: Blob | null, name: string | null }>({ blob: null, name: null });
     status = $state<{ isRecording: boolean, isProcessing: boolean }>({ isRecording: false, isProcessing: false });
@@ -28,10 +33,20 @@
       formData.append('file', this.audio.blob, this.audio.name || 'audio.webm');
 
       try {
-        await fetch('http://localhost:8000/analyze/semantic', { 
-          method: 'POST', 
-          body: formData 
+        const response = await fetch('http://localhost:8000/analyze/semantic', { 
+          method: 'POST',
+          body: formData
         });
+
+        if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
+
+        const data: CriteriaContextData = await response.json();
+
+        this.messages = data.all_messages;
+        this.criterias = data.criterias;
+
         this.clearAudio();
       } catch (error) {
         console.error("Upload failed:", error);
@@ -62,9 +77,17 @@
           </div>
           
           <div class="chat-messages">
-            <div class="message system">
-              Awaiting audio input to begin analysis...
-            </div>
+            {#if session.messages.length === 0}
+              <div class="message system">
+                Awaiting audio input to begin analysis...
+              </div>
+            {:else}
+              {#each session.messages as message}
+                <div class="message user-message">
+                  {message}
+                </div>
+              {/each}
+            {/if}
           </div>
 
           <div class="chat-input-area">
