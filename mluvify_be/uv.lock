@@ -200,6 +200,17 @@ wheels = [
 ]
 
 [[package]]
+name = "cs-core-news-sm"
+version = "0.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/67/2c0a263f586498da2519c04afe28e1eba1892c130c66c21e715220c69385/cs_core_news_sm-0.2.1-py3-none-any.whl", hash = "sha256:6d48e540aac77fa6a8f79979d3f6f596867807a46851c8117428a8e6eb2f2f74", size = 10925379, upload-time = "2026-05-17T19:38:05.395Z" },
+]
+
+[[package]]
 name = "ctranslate2"
 version = "4.7.2"
 source = { registry = "https://pypi.org/simple" }
@@ -683,6 +694,7 @@ name = "mluvify-be"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "cs-core-news-sm" },
     { name = "fastapi", extra = ["standard"] },
     { name = "faster-whisper" },
     { name = "filetype" },
@@ -696,6 +708,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "cs-core-news-sm", specifier = ">=0.2.1" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.136.1" },
     { name = "faster-whisper", specifier = ">=1.2.1" },
     { name = "filetype", specifier = ">=1.2.0" },
