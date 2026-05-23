@@ -15,7 +15,8 @@ class CriteriaContextData(BaseModel):
                                                                                                            
 class CriteriaContext:
     def __init__(self) -> None:
-       self.criteria_data = CriteriaContextData(
+        self.llm_msg = []        
+        self.criteria_data = CriteriaContextData(
             criterias={},
             all_messages=[]
         )

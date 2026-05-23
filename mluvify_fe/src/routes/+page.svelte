@@ -8,29 +8,29 @@
     all_messages: string[],
   }
 
-  class SessionData {
-    messages = $state<string[]>([]);
-    criterias = $state<Record<string, number[]>>({});
-    
-    audio = $state<{ blob: Blob | null, name: string | null }>({ blob: null, name: null });
-    status = $state<{ isRecording: boolean, isProcessing: boolean }>({ isRecording: false, isProcessing: false });
+  // Define the entire session as a single deeply reactive state object
+  const session = $state({
+    messages: [] as string[],
+    criterias: {} as Record<string, number[]>,
+    audio: { blob: null as Blob | null, name: null as string | null },
+    status: { isRecording: false, isProcessing: false },
 
     setAudio(blob: Blob, name: string) {
-      this.audio.blob = blob;
-      this.audio.name = name;
-    }
+      session.audio.blob = blob;
+      session.audio.name = name;
+    },
 
     clearAudio() {
-      this.audio.blob = null;
-      this.audio.name = null;
-    }
+      session.audio.blob = null;
+      session.audio.name = null;
+    },
 
     async send() {
-      if (!this.audio.blob) return;
-      this.status.isProcessing = true;
+      if (!session.audio.blob) return;
+      session.status.isProcessing = true;
 
       const formData = new FormData();
-      formData.append('file', this.audio.blob, this.audio.name || 'audio.webm');
+      formData.append('file', session.audio.blob, session.audio.name || 'audio.webm');
 
       try {
         const response = await fetch('http://localhost:8000/analyze/semantic', { 
@@ -43,20 +43,20 @@
         }
 
         const data: CriteriaContextData = await response.json();
+        console.log("Data from backend:", data); // Check the array length here!
 
-        this.messages = data.all_messages;
-        this.criterias = data.criterias;
+        // Directly update the reactive object
+        session.messages = data.all_messages;
+        session.criterias = data.criterias;
 
-        this.clearAudio();
+        session.clearAudio();
       } catch (error) {
         console.error("Upload failed:", error);
       } finally {
-        this.status.isProcessing = false;
+        session.status.isProcessing = false;
       }
     }
-  }
-
-  const session = new SessionData();
+  });
 </script>
 
 <div class="app-container">
@@ -112,13 +112,40 @@
           </div>
           
           <div class="stats-content">
-            <div class="placeholder-card">
-              <p class="placeholder-title">Awaiting Audio</p>
-              <p class="placeholder-text">Semantic and acoustic metrics will appear here</p>
-            </div>
+            <!-- Check if there is any criteria data yet -->
+            {#if Object.keys(session.criterias).length === 0}
+              <div class="placeholder-card">
+                <p class="placeholder-title">Awaiting Audio</p>
+                <p class="placeholder-text">Semantic and acoustic metrics will appear here</p>
+              </div>
+            {:else}
+              <div class="criteria-list">
+                <!-- Loop through the dictionary keys and values -->
+                {#each Object.entries(session.criterias) as [name, values]}
+                  <!-- Grab the most recent value from the array, fallback to 0 -->
+                  {@const latestValue = values[values.length - 1] || 0}
+                  
+                  <div class="criteria-item">
+                    <div class="criteria-header">
+                      <span class="criteria-name">{name.replace(/_/g, ' ')}</span>
+                      <!-- Display the raw number formatted to 2 decimal places in a badge -->
+                      <span class="criteria-value">{latestValue.toFixed(2)}</span> 
+                    </div>
+                    
+                    <!-- The visual bar (0 to 1 mapped to 0% to 100%) -->
+                    <div class="progress-track">
+                      <div 
+                        class="progress-fill" 
+                        style="width: {latestValue * 100}%"
+                      ></div>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {/if}
           </div>
         </div>
-      </div>
+      </div>  
     </main>
   </div>
 </div>
@@ -224,18 +251,18 @@
     margin-bottom: auto;
   }
 
-  /* --- NEW CHAT STYLES --- */
+  /* --- CHAT STYLES --- */
   .message-wrapper {
     display: flex;
     width: 100%;
   }
 
   .message-wrapper.user {
-    justify-content: flex-end; /* Push user message to the right */
+    justify-content: flex-end;
   }
 
   .message-wrapper.bot {
-    justify-content: flex-start; /* Push bot message to the left */
+    justify-content: flex-start;
   }
 
   .message-bubble {
@@ -247,20 +274,17 @@
     word-break: break-word;
   }
 
-  /* User Bubble Styling */
   .message-wrapper.user .message-bubble {
-    background-color: #2563eb; /* Blue */
+    background-color: #2563eb; 
     color: #ffffff;
-    border-bottom-right-radius: 4px; /* Flattens the bottom-right corner slightly */
+    border-bottom-right-radius: 4px; 
   }
 
-  /* Bot Bubble Styling */
   .message-wrapper.bot .message-bubble {
-    background-color: #262626; /* Dark gray */
+    background-color: #262626; 
     color: #e5e5e5;
-    border-bottom-left-radius: 4px; /* Flattens the bottom-left corner slightly */
+    border-bottom-left-radius: 4px; 
   }
-  /* ----------------------- */
 
   .chat-input-area {
     padding: 1.25rem;
@@ -303,5 +327,59 @@
     font-size: 0.75rem;
     color: #525252;
     margin: 0;
+  }
+
+  /* --- NEW CRITERIA LIST STYLES --- */
+  .criteria-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem; /* Spacious gap between criteria items */
+  }
+
+  .criteria-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Gap between header and progress bar */
+  }
+
+  .criteria-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .criteria-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #d4d4d4;
+    text-transform: capitalize;
+  }
+
+  .criteria-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #262626; /* Dark pill badge */
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px; /* Fully rounded edges */
+    font-variant-numeric: tabular-nums; /* Keeps width consistent as numbers change */
+    border: 1px solid #333;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 6px;
+    background-color: #1f1f1f; /* Deeper background for the track */
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    /* Sleek gradient from blue to purple matching the dark theme */
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6); 
+    border-radius: 9999px;
+    /* Smooth transition when values change */
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 </style>

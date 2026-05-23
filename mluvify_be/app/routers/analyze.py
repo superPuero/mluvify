@@ -164,15 +164,24 @@ async def analyze_semantic(
         message_entry=message_entry
     )
 
+    criteria_context.criteria_data.all_messages.append(text_from_audio);
+    criteria_context.llm_msg.append( {"role": "user", "content": text_from_audio} );
+    
     compute_scores(
         criteria_context=criteria_context, 
         lex_richness=get_lexical_metrics(criteria_context=criteria_context, message_entry=message_entry),
         window_semantics_sim=window_semantic_similarity_evaluate(criteria_context=criteria_context, message_entry=message_entry),
         speech_rate_data=speech_rate_evaluate(segments=segments, criteria_context=criteria_context, message_entry=message_entry),
         speech_graph_data=speech_graph_criteria(criteria_context=criteria_context, graph_model=graph_model, message_entry=message_entry)           
-    );
+    );    
   
-    
+    response = await ollama.chat(
+        "llama3.1",
+        messages=criteria_context.llm_msg
+    )
+
+    criteria_context.criteria_data.all_messages.append(response["message"]["content"])
+    criteria_context.llm_msg.append(response["message"])
   
     return criteria_context.criteria_data
 
