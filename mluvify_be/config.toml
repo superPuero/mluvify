@@ -3,3 +3,8 @@ name="Mluvify"
 
 [ollama]
 host="http://localhost:11434"
+
+[whisper]
+model_size="medium"
+device="cuda"
+compute_type="int8"
