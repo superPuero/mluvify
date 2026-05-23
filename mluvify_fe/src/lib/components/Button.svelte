@@ -32,7 +32,6 @@
     <div class="spinner"></div>
     <span class="status truncate">{loadingText}</span>
   {:else}
-    <!-- Render the custom icon snippet if provided -->
     {#if icon}
       {@render icon()}
     {/if}
@@ -47,14 +46,12 @@
 </button>
 
 <style>
-  /* Reset default button styles */
   button {
     appearance: none;
     font-family: inherit;
     margin: 0;
   }
 
-  /* Compact Container (matches your upload label) */
   .compact-button {
     display: flex;
     align-items: center;
@@ -69,13 +66,11 @@
     width: auto;
   }
 
-  /* Hover state */
   .compact-button:hover:not(.loading):not(:disabled) {
     border-color: #404040;
     background-color: #171717;
   }
 
-  /* Loading & Disabled States */
   .compact-button:disabled {
     cursor: not-allowed;
     background-color: rgba(23, 23, 23, 0.5);
@@ -85,7 +80,6 @@
     border-style: dashed;
   }
 
-  /* Target SVGs passed via the icon snippet */
   :global(.compact-button > svg) {
     color: #a3a3a3;
     flex-shrink: 0;
@@ -93,28 +87,24 @@
     height: 16px;
   }
 
-  /* Text styling */
   .status {
-    font-size: 0.8125rem; /* 13px */
+    font-size: 0.8125rem;
     color: #e5e5e5;
     white-space: nowrap;
   }
 
-  /* Secondary text */
   .meta {
     color: #737373;
     font-size: 0.75rem;
     margin-left: 0.25rem;
   }
 
-  /* Helper for long text */
   .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 120px;
   }
 
-  /* Minimal Spinner */
   .spinner {
     width: 14px;
     height: 14px;

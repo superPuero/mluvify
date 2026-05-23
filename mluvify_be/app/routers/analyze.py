@@ -1,3 +1,4 @@
+import io
 from fastapi import APIRouter
 from app.utils.deps import AudioFile
 from app.core.whisper import WhisperDep, WhisperModel
@@ -7,22 +8,22 @@ from app.core.networkx import NetworkxDep
 from app.core.context import CriteriaContextDep, MessageEntry
 from app.criteria.speech_graph import speech_graph_criteria
 
-import io
 
 router = APIRouter(
     prefix="/analyze",
     tags=["Analyze"],
 )
 
+
 @router.post("/semantic")
 async def analyze_semantic(
-        ollama: OllamaDep, 
-        wisper: WhisperDep, 
-        graph_model: NetworkxDep, 
-        spacy_model: SpacyModelDep, 
-        criteria_context: CriteriaContextDep, 
-        file: AudioFile
-    ):     
+    ollama: OllamaDep, 
+    wisper: WhisperDep, 
+    graph_model: NetworkxDep, 
+    spacy_model: SpacyModelDep, 
+    criteria_context: CriteriaContextDep, 
+    file: AudioFile
+) -> None:
     wisper_model: WhisperModel = await wisper()
     file_bytes = await file.read()
     audio_stream = io.BytesIO(file_bytes)
@@ -41,9 +42,3 @@ async def analyze_semantic(
     message_entry: MessageEntry = MessageEntry(text=text_from_audio, sentences=sentences_list, parts_and_lemmas=spacy_model.into_part_and_lemmas(text_from_audio))
     criteria_context.criterias['FlowCriteria'] += speech_graph_criteria(criteria_context=criteria_context, graph_model=graph_model, message_entry=message_entry)
     print(criteria_context.criterias['FlowCriteria'])
-    pass
-
-
-@router.get("/rithoric", deprecated=True)
-async def analyze_rithoric():
-    pass
