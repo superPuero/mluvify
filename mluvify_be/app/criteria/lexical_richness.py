@@ -27,7 +27,7 @@ def get_lexical_metrics(criteria_context: CriteriaContext, message_entry: Messag
     except Exception:
         hdd = 0.0
 
-    return LexicalRichness({
+    return LexicalRichnessData(data={
         "ttr": ttr,
         "mattr": mattr,
         "mtld": mtld,
