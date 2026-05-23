@@ -16,7 +16,7 @@
       const formData = new FormData();
       formData.append('file', audioBlob, 'recording.webm');
 
-      await fetch('http://localhost:8000/analyze', { method: 'POST', body: formData });
+      await fetch('http://localhost:8000/analyze/semantic', { method: 'POST', body: formData });
       audioChunks = [];
       stream.getTracks().forEach(track => track.stop());
     };

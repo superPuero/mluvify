@@ -1,16 +1,17 @@
 import networkx as nx
 import numpy as np
-from lemmas_part import lemmas_from_text
+from app.core.context import CriteriaContext, MessageEntry
+from networkx import DiGraph
 
-def speech_graph_criteria() -> int:
-    if len(lemmas_from_text) < 2:
-        print("Not enough words.")
+def speech_graph_criteria(criteria_context: CriteriaContext, graph_model: DiGraph, message_entry: MessageEntry) -> int:
+    if len(message_entry.parts_and_lemmas.lemmas) < 2:
+        return -4
     else:
         G = nx.DiGraph()
 
-        for i in range(len(lemmas_from_text) - 1):
-            word_from = lemmas_from_text[i]
-            word_to = lemmas_from_text[i+1]
+        for i in range(len(message_entry.parts_and_lemmas.lemmas) - 1):
+            word_from = message_entry.parts_and_lemmas.lemmas[i]
+            word_to = message_entry.parts_and_lemmas.lemmas[i+1]
             G.add_edge(word_from, word_to)
 
         num_nodes = G.number_of_nodes()
@@ -23,13 +24,13 @@ def speech_graph_criteria() -> int:
         scc = nx.number_strongly_connected_components(G)
 
         l1_loops = 0
-        for i in range(len(lemmas_from_text) - 1):
-            if lemmas_from_text[i] == lemmas_from_text[i+1]:
+        for i in range(len(message_entry.parts_and_lemmas.lemmas) - 1):
+            if message_entry.parts_and_lemmas.lemmas[i] == message_entry.parts_and_lemmas.lemmas[i+1]:
                 l1_loops += 1
 
         l2_loops = 0
-        for i in range(len(lemmas_from_text) - 2):
-            if lemmas_from_text[i] == lemmas_from_text[i+2] and lemmas_from_text[i] != lemmas_from_text[i+1]:
+        for i in range(len(message_entry.parts_and_lemmas.lemmas) - 2):
+            if message_entry.parts_and_lemmas.lemmas[i] == message_entry.parts_and_lemmas.lemmas[i+2] and message_entry.parts_and_lemmas.lemmas[i] != message_entry.parts_and_lemmas.lemmas[i+1]:
                 l2_loops += 1
 
         print(f"Nodes: {num_nodes}")

@@ -5,7 +5,6 @@ from faster_whisper import WhisperModel
 
 from app.core.settings import settings
 
-
 class WhisperServiceManager:
     def __init__(self) -> None:
         self._model: WhisperModel | None = None
@@ -28,6 +27,5 @@ class WhisperServiceManager:
 
 
 whisper_service: WhisperServiceManager = WhisperServiceManager()
-
 
 WhisperDep = Annotated[WhisperServiceManager, Depends(whisper_service)]
