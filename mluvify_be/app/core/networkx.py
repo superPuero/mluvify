@@ -4,7 +4,7 @@ from fastapi import Depends
 
 class NetxGraph:
     def __init__(self):
-        self.graph: DiGraph 
+        self.graph: DiGraph = DiGraph() 
               
     def __call__(self):
         return self          

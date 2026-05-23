@@ -9,6 +9,7 @@ dependencies = [
     "fastapi[standard]>=0.136.1",
     "faster-whisper>=1.2.1",
     "filetype>=1.2.0",
+    "lexicalrichness>=0.5.1",
     "networkx>=3.6.1",
     "ollama>=0.6.2",
     "pydantic>=2.13.4",

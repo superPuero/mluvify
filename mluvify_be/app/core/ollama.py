@@ -22,5 +22,4 @@ class OllamaServiceManager:
 
 ollama_service: OllamaServiceManager = OllamaServiceManager()
 
-
 OllamaDep = Annotated[AsyncClient, Depends(ollama_service)]

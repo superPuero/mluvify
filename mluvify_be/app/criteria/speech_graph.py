@@ -3,7 +3,7 @@ import numpy as np
 from app.core.context import CriteriaContext, MessageEntry
 from app.core.networkx import NetxGraph
 
-def speech_graph_criteria(criteria_context: CriteriaContext, graph_model: NetxGraph, message_entry: MessageEntry) -> int:
+def speech_graph_criteria(criteria_context: CriteriaContext, graph_model: NetxGraph, message_entry: MessageEntry) -> float:
     if len(message_entry.parts_and_lemmas.lemmas) < 2:
         return -4
     else:

@@ -14,9 +14,10 @@ from app.core.whisper import whisper_service
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    
     await ollama_service.startup()
     await whisper_service.startup()
-
+    
     yield
 
     await ollama_service.shutdown()
@@ -36,8 +37,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app = FastAPI()
 
 ROOT_DIR = Path(__file__).parent.parent.parent
 FRONTEND_BUILD_DIR = ROOT_DIR / "mluvify_fe" / "build"

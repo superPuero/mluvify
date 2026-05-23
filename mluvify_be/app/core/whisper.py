@@ -28,4 +28,4 @@ class WhisperServiceManager:
 
 whisper_service: WhisperServiceManager = WhisperServiceManager()
 
-WhisperDep = Annotated[WhisperServiceManager, Depends(whisper_service)]
+WhisperDep = Annotated[WhisperModel, Depends(whisper_service)]
