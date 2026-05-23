@@ -26,7 +26,9 @@ class SpacyModel:
                 parts.append(token.pos_)
                 
         return SpacyPartsAndLemmas(lemmas=lemmas, parts=parts);
-
+    
+    def __call__(self):
+        return self  
     
 spacy_model: SpacyModel = SpacyModel("cs_core_news_sm")
 SpacyModelDep = Annotated[SpacyModel, Depends(spacy_model)]

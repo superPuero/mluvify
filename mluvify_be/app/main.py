@@ -42,5 +42,5 @@ app = FastAPI()
 ROOT_DIR = Path(__file__).parent.parent.parent
 FRONTEND_BUILD_DIR = ROOT_DIR / "mluvify_fe" / "build"
 
-app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR), html=True), name="frontend")
 app.include_router(analyze_router)
+app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR), html=True), name="frontend")

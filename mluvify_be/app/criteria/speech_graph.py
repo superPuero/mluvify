@@ -1,27 +1,25 @@
 import networkx as nx
 import numpy as np
 from app.core.context import CriteriaContext, MessageEntry
-from networkx import DiGraph
+from app.core.networkx import NetxGraph
 
-def speech_graph_criteria(criteria_context: CriteriaContext, graph_model: DiGraph, message_entry: MessageEntry) -> int:
+def speech_graph_criteria(criteria_context: CriteriaContext, graph_model: NetxGraph, message_entry: MessageEntry) -> int:
     if len(message_entry.parts_and_lemmas.lemmas) < 2:
         return -4
     else:
-        G = nx.DiGraph()
-
         for i in range(len(message_entry.parts_and_lemmas.lemmas) - 1):
             word_from = message_entry.parts_and_lemmas.lemmas[i]
             word_to = message_entry.parts_and_lemmas.lemmas[i+1]
-            G.add_edge(word_from, word_to)
+            graph_model.graph.add_edge(word_from, word_to)
 
-        num_nodes = G.number_of_nodes()
-        num_edges = G.number_of_edges()
+        num_nodes = graph_model.graph.number_of_nodes()
+        num_edges = graph_model.graph.number_of_edges()
 
-        density = nx.density(G)
+        density = nx.density(graph_model.graph)
 
-        clustering_coeff = nx.average_clustering(G.to_undirected())
+        clustering_coeff = nx.average_clustering(graph_model.graph.to_undirected())
 
-        scc = nx.number_strongly_connected_components(G)
+        scc = nx.number_strongly_connected_components(graph_model.graph)
 
         l1_loops = 0
         for i in range(len(message_entry.parts_and_lemmas.lemmas) - 1):
@@ -43,7 +41,5 @@ def speech_graph_criteria(criteria_context: CriteriaContext, graph_model: DiGrap
         if clustering_coeff > 0.3 or l2_loops > 2:
             print("Here is loops")
             return +12
-            # print("You have some alzheimer")
         else:
             return -12
-            # print("Everything is ok.")

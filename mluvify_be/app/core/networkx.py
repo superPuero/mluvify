@@ -2,6 +2,13 @@ from networkx import DiGraph
 from typing import Annotated
 from fastapi import Depends
 
-networkx_graph: DiGraph = DiGraph()
+class NetxGraph:
+    def __init__(self):
+        self.graph: DiGraph 
+              
+    def __call__(self):
+        return self          
 
-NetworkxDep = Annotated[DiGraph, Depends(networkx_graph)]
+networkx_graph: NetxGraph = NetxGraph()
+
+NetworkxDep = Annotated[NetxGraph, Depends(networkx_graph)]

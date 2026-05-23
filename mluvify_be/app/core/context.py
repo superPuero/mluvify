@@ -12,8 +12,11 @@ class MessageEntry(BaseModel):
 class CriteriaContext:
     def __init__(self) -> None:
         self.criterias: dict[str, list[float]] = {}
-        self.all_messages: list[str] = {}            
-                                
+        self.all_messages: list[str] = {}      
+              
+    def __call__(self):
+        return self
+                                    
 criteria_context: CriteriaContext = CriteriaContext();
 
 CriteriaContextDep = Annotated[CriteriaContext, Depends(criteria_context)]

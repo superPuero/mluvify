@@ -12,4 +12,6 @@ dependencies = [
     "ollama>=0.6.2",
     "pydantic>=2.13.4",
     "pydantic-settings[toml]>=2.14.1",
+    "python-multipart>=0.0.29",
+    "spacy>=3.8.14",
 ]
