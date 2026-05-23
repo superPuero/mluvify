@@ -6,16 +6,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
 from app.routers.analyze import router as analyze_router
+
 from app.core.settings import settings
 from app.core.ollama import ollama_service
+from app.core.whisper import whisper_service
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await ollama_service.startup()
+    await whisper_service.startup()
 
     yield
 
     await ollama_service.shutdown()
+    await whisper_service.shutdown()
 
 
 app = FastAPI(
