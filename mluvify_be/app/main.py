@@ -8,7 +8,6 @@ from pathlib import Path
 from app.routers.analyze import router as analyze_router
 from app.core.settings import settings
 from app.core.ollama import ollama_service
-from app.core.whisper import whisper_model
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:

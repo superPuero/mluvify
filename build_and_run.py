@@ -68,7 +68,7 @@ def start_server() -> None:
             "app.main:app", 
             "--host", "127.0.0.1", 
             "--port", "8000"
-        ], cwd=BACKEND_DIR)
+        ], cwd=BACKEND_DIR,  text=True)
         
     except KeyboardInterrupt:
         print("\nServer stopped.")
