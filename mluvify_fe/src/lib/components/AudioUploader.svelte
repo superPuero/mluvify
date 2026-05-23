@@ -1,42 +1,36 @@
 <script lang="ts">
-  let isUploading = $state(false);
-  let selectedFileName = $state<string | null>(null);
+  let { session } = $props<{ session: any }>();
 
-  async function handleUpload(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
+  const uploader = {
+    handleFile(event: Event) {
+      const input = event.target as HTMLInputElement;
+      if (!input.files?.length) return;
 
-    const file = input.files[0];
-    selectedFileName = file.name;
-    isUploading = true;
+      const file = input.files[0];
+      session.setAudio(file, file.name);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      // Changed to use a variable for cleaner URL management in real apps
-      await fetch('http://localhost:8000/analyze/semantic', { method: 'POST', body: formData });
-    } catch (error) {
-      console.error("Upload failed:", error);
-    } finally {
-      isUploading = false;
-      input.value = '';
+      input.value = ''; 
     }
-  }
+  };
 </script>
 
-<label class="compact-upload {isUploading ? 'uploading' : ''}">
+<label class="compact-upload {session.status.isProcessing ? 'uploading' : ''}">
   <input
     type="file"
     accept="audio/*"
-    onchange={handleUpload}
+    onchange={uploader.handleFile}
     class="hidden-input"
-    disabled={isUploading}
+    disabled={session.status.isProcessing}
   />
 
-  {#if isUploading}
+  {#if session.status.isProcessing}
     <div class="spinner"></div>
-    <span class="status truncate">Analyzing {selectedFileName}...</span>
+    <span class="status truncate">Analyzing {session.audio.name}...</span>
+  {:else if session.audio.name && !session.status.isRecording}
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" class="icon">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+    <span class="status truncate">Ready: {session.audio.name}</span>
   {:else}
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon">
       <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -46,12 +40,10 @@
 </label>
 
 <style>
-  /* Base styles to maintain functionality */
   .hidden-input {
     display: none;
   }
 
-  /* Compact Container */
   .compact-upload {
     display: flex;
     align-items: center;
@@ -62,51 +54,44 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s ease;
-    max-width: 100%; /* Ensure it fits its parent */
-    width: auto; /* Don't take up full width by default */
+    max-width: 100%;
+    width: auto;
   }
 
-  /* Hover state */
   .compact-upload:hover:not(.uploading) {
     border-color: #404040;
     background-color: #171717;
   }
 
-  /* Uploading/Disabled State */
   .compact-upload.uploading {
     cursor: not-allowed;
     background-color: rgba(23, 23, 23, 0.5);
     border-style: dashed;
   }
 
-  /* Icon styling */
   .icon {
     color: #a3a3a3;
     flex-shrink: 0;
   }
 
-  /* Text styling */
   .status {
-    font-size: 0.8125rem; /* 13px */
+    font-size: 0.8125rem;
     color: #e5e5e5;
     white-space: nowrap;
   }
 
-  /* Secondary text (Max size) */
   .meta {
     color: #737373;
     font-size: 0.75rem;
     margin-left: 0.25rem;
   }
 
-  /* Helper for long filenames during upload */
   .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100px; /* Adjust as needed for your layout */
+    max-width: 100px;
   }
 
-  /* Minimal Spinner */
   .spinner {
     width: 14px;
     height: 14px;

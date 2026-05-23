@@ -1,79 +1,103 @@
-  <script lang="ts">
-    import AudioRecorder from '$lib/components/AudioRecorder.svelte';
-    import AudioUploader from '$lib/components/AudioUploader.svelte';
-    import Button from '$lib/components/Button.svelte';
-  //   import LiveTranscript from '$lib/components/LiveTranscript.svelte';
-  //   import ChatMessage from '$lib/components/ChatMessage.svelte';
-  //   import StatsCard from '$lib/components/StatsCard.svelte';
+<script lang="ts">
+  import AudioRecorder from '$lib/components/AudioRecorder.svelte';
+  import AudioUploader from '$lib/components/AudioUploader.svelte';
+  import Button from '$lib/components/Button.svelte';
 
-    let messages = $state([])
-    let criterias = $state({})
-  </script>
+  class SessionData {
+    messages = $state([]);
+    criterias = $state({});
+    
+    audio = $state<{ blob: Blob | null, name: string | null }>({ blob: null, name: null });
+    status = $state<{ isRecording: boolean, isProcessing: boolean }>({ isRecording: false, isProcessing: false });
 
-  <div class="app-container">
-    <div class="content-wrapper">
-      <header class="header">
-        <h1 class="title">Mluvify</h1>
-        <p class="subtitle">
-          AI-powered semantic speech analysis for detecting potential psychological and neurological patterns.
-        </p>
-      </header>
+    setAudio(blob: Blob, name: string) {
+      this.audio.blob = blob;
+      this.audio.name = name;
+    }
 
-      <main class="grid-layout">
-        <!-- Left Column: LLM Chat -->
-        <div class="column">
-          <div class="panel chat-panel">
-            <div class="panel-header">
-              <h2>Live Session</h2>
+    clearAudio() {
+      this.audio.blob = null;
+      this.audio.name = null;
+    }
+
+    async send() {
+      if (!this.audio.blob) return;
+      this.status.isProcessing = true;
+
+      const formData = new FormData();
+      formData.append('file', this.audio.blob, this.audio.name || 'audio.webm');
+
+      try {
+        await fetch('http://localhost:8000/analyze/semantic', { 
+          method: 'POST', 
+          body: formData 
+        });
+        this.clearAudio();
+      } catch (error) {
+        console.error("Upload failed:", error);
+      } finally {
+        this.status.isProcessing = false;
+      }
+    }
+  }
+
+  const session = new SessionData();
+</script>
+
+<div class="app-container">
+  <div class="content-wrapper">
+    <header class="header">
+      <h1 class="title">Mluvify</h1>
+      <p class="subtitle">
+        AI-powered semantic speech analysis for detecting potential psychological and neurological patterns.
+      </p>
+    </header>
+
+    <main class="grid-layout">
+      <!-- Left Column: LLM Chat -->
+      <div class="column">
+        <div class="panel chat-panel">
+          <div class="panel-header">
+            <h2>Live Session</h2>
+          </div>
+          
+          <div class="chat-messages">
+            <div class="message system">
+              Awaiting audio input to begin analysis...
             </div>
-            
-            <!-- Chat Messages Area -->   
-            <div class="chat-messages">
-              <!-- Example placeholder for messages -->
-              <div class="message system">
-                Awaiting audio input to begin analysis...
-              </div>
-            </div>
+          </div>
 
-            <!-- Input Area (Audio Components) -->
-            <div class="chat-input-area">
-              <Button label="send"/>
-              <AudioRecorder />
-              <AudioUploader />
-              <!-- <LiveTranscript /> -->
+          <div class="chat-input-area">
+            <Button 
+              label={session.status.isProcessing ? "Processing..." : "Send Audio"} 
+              onclick={() => session.send()} 
+              disabled={!session.audio.blob || session.status.isProcessing} 
+            />
+            <AudioRecorder {session} />
+            <AudioUploader {session} />
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="panel stats-panel">
+          <div class="panel-header">
+            <h2>Evaluation Statistics</h2>
+          </div>
+          
+          <div class="stats-content">
+            <div class="placeholder-card">
+              <p class="placeholder-title">Awaiting Audio</p>
+              <p class="placeholder-text">Semantic and acoustic metrics will appear here</p>
             </div>
           </div>
         </div>
-
-        <!-- Right Column: Evaluation Statistics -->
-        <div class="column">
-          <div class="panel stats-panel">
-            <div class="panel-header">
-              <h2>Evaluation Statistics</h2>
-            </div>
-            
-            <div class="stats-content">
-              <!-- Placeholder until data arrives -->
-              <div class="placeholder-card">
-                <p class="placeholder-title">Awaiting Audio</p>
-                <p class="placeholder-text">Semantic and acoustic metrics will appear here</p>
-              </div>
-
-              <!-- Example of how stats might look once populated:
-              <div class="stat-group">
-                <h3>Vocal Biomarkers</h3>
-                ...
-              </div>
-              -->
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   </div>
+</div>
 
   <style>
-    /* Global-ish reset for this container */
     :global(body) {
       margin: 0;
       padding: 0;
@@ -90,7 +114,6 @@
     }
 
     .content-wrapper {
-      /* Widened from 1000px to 1200px to better support a dual-pane layout */
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -119,15 +142,12 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 2rem;
-      /* Sets a fixed height so the chat can scroll internally */
       height: calc(100vh - 180px);
       min-height: 500px;
     }
 
-    /* Desktop layout - splitting the grid */
     @media (min-width: 768px) {
       .grid-layout {
-        /* Gives slightly more room to the chat (60/40 split) */
         grid-template-columns: 3fr 2fr;
       }
     }
@@ -138,7 +158,6 @@
       height: 100%;
     }
 
-    /* Shared Panel Styling */
     .panel {
       background-color: #0a0a0a;
       border: 1px solid #262626;
@@ -162,7 +181,6 @@
       color: #d4d4d4;
     }
 
-    /* Chat Specific Styling */
     .chat-messages {
       flex: 1;
       padding: 1.25rem;
@@ -189,7 +207,6 @@
       gap: 1rem;
     }
 
-    /* Stats Specific Styling */
     .stats-content {
       flex: 1;
       padding: 1.25rem;
@@ -198,7 +215,6 @@
       flex-direction: column;
     }
 
-    /* Placeholder Styling */
     .placeholder-card {
       height: 100%;
       min-height: 300px;
